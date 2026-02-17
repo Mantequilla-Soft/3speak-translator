@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: 3speak-translate
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # Load ~33 most useful languages (~5 GB RAM)
+      - LT_LOAD_ONLY=en,zh,hi,es,fr,ar,bn,pt,ru,ja,de,ko,it,nl,pl,tr,vi,th,id,uk,sv,cs,el,hu,fi,da,ro,he,fa,tl,ms,bg,nb,ur
+      # No API key required for local use
+      - LT_API_KEYS=false
+      # Disable features we don't need
+      - LT_DISABLE_FILES_TRANSLATION=true
+      - LT_SUGGESTIONS=false
+    volumes:
+      # Persist downloaded language models across restarts
+      - lt-models:/home/libretranslate/.local
+    deploy:
+      resources:
+        limits:
+          memory: 5G
+
+volumes:
+  lt-models:
