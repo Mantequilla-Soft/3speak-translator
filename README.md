@@ -23,7 +23,7 @@ First startup takes a few minutes while language models download. Subsequent sta
 ## Test
 
 ```bash
-curl -X POST https://3speak-translator.okinoko.io/translate \
+curl -X POST http://localhost:5000/translate \
   -H 'Content-Type: application/json' \
   -d '{"q":"Hello world","source":"en","target":"de","format":"text"}'
 ```
@@ -49,9 +49,28 @@ See [LibreTranslate API docs](https://libretranslate.com/docs/) for full referen
 | `LT_LOAD_ONLY` | 34 languages | Comma-separated language codes to load |
 | `LT_API_KEYS` | `false` | Require API keys (disabled for local use) |
 
-## Production
+## Nginx Setup
 
-Exposed via nginx reverse proxy at `https://3speak-translator.okinoko.io` with Let's Encrypt SSL.
+An example nginx config is provided in [nginx/translator.conf.example](nginx/translator.conf.example).
+
+To set it up on your server:
+
+```bash
+# Copy and rename with your domain
+sudo cp nginx/translator.conf.example /etc/nginx/sites-available/translator.yourdomain.com
+
+# Edit the file and replace translator.example.com with your domain
+sudo nano /etc/nginx/sites-available/translator.yourdomain.com
+
+# Enable the site
+sudo ln -s /etc/nginx/sites-available/translator.yourdomain.com /etc/nginx/sites-enabled/
+
+# Test and reload nginx
+sudo nginx -t && sudo systemctl reload nginx
+
+# Obtain SSL certificate
+sudo certbot --nginx -d translator.yourdomain.com
+```
 
 The 3speak.tv frontend connects via the `VITE_TRANSLATE_API_URL` environment variable.
 
